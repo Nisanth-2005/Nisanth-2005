@@ -16,6 +16,7 @@
         </div>
 
         <h2>Business Expenses Calculator</h2>
+        
         <!-- Input Fields -->
         <div class="form-group">
             <label for="workers">Number of Workers:</label>
@@ -32,6 +33,10 @@
         <div class="form-group">
             <label for="extraWorkers">Number of Workers Doing Shell Cutting:</label>
             <input type="number" id="extraWorkers" min="0" placeholder="Enter number of workers doing shell cutting" onchange="generateWorkerFields()">
+        </div>
+        <div class="form-group">
+            <label for="shellCuttingCost">Cost per KG for Shell Cutting (in INR):</label>
+            <input type="number" id="shellCuttingCost" min="0" placeholder="Enter cost per KG for shell cutting">
         </div>
         <div id="extraWorkFields"></div>
 
