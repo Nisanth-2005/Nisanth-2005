@@ -29,12 +29,12 @@ function generateWorkerFields() {
                 <input type="text" id="workerName_${i}" placeholder="Enter Worker ${i}'s Name">
             </div>
             <div class="form-group">
-                <label for="extraWork_${i}">Worker ${i} Extra Work (KG):</label>
-                <input type="number" id="extraWork_${i}" min="0" placeholder="Enter extra work in KG">
+                <label for="extraWork_${i}">Worker ${i} Shell Cutting (KG):</label>
+                <input type="number" id="extraWork_${i}" min="0" placeholder="Enter shell cutting in KG">
             </div>
             <div class="form-group">
-                <label for="extraWorkCost_${i}">Worker ${i} Cost per KG (INR):</label>
-                <input type="number" id="extraWorkCost_${i}" min="0" placeholder="Enter cost per KG of extra work">
+                <label for="extraWorkCost_${i}">Worker ${i} Cost per KG for Shell Cutting (INR):</label>
+                <input type="number" id="extraWorkCost_${i}" min="0" placeholder="Enter cost per KG of shell cutting">
             </div>
             <div class="form-group">
                 <label for="daysWorked_${i}">Worker ${i} Days Worked (out of 7):</label>
@@ -61,7 +61,7 @@ function calculate() {
     const now = new Date();
     const formattedDate = now.toLocaleDateString('en-IN');
 
-    // Calculate extra work cost and weekly salary for each worker
+    // Calculate shell cutting cost and weekly salary for each worker
     for (let i = 1; i <= extraWorkers; i++) {
         const name = document.getElementById(`workerName_${i}`).value;
         const extraWork = document.getElementById(`extraWork_${i}`).value;
@@ -117,7 +117,7 @@ function downloadPDF(reportType) {
 
     doc.text(`Business Expenses Report - ${reportType}`, 14, 10);
     doc.autoTable({
-        head: [['Worker Name', 'Daily Wage (INR)', 'Days Worked', 'Weekly Salary (INR)', 'Extra Work (KG)', 'Extra Work Cost (INR)', 'Date']],
+        head: [['Worker Name', 'Daily Wage (INR)', 'Days Worked', 'Weekly Salary (INR)', 'Shell Cutting (KG)', 'Shell Cutting Cost (INR)', 'Date']],
         body: expenseData[reportType].map(worker => [
             worker.name,
             worker.dailyWage,
