@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Expenses Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.14/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body onload="displayDateTime()">
+    <div class="container">
+        <div class="header">
+            <h1>Janasena Enterprises</h1>
+            <div id="dateTime"></div>
+        </div>
+
+        <h2>Business Expenses Calculator</h2>
+        <!-- Input Fields -->
+        <div class="form-group">
+            <label for="workers">Number of Workers:</label>
+            <input type="number" id="workers" min="0" placeholder="Enter number of workers">
+        </div>
+        <div class="form-group">
+            <label for="dailyWage">Daily Wage per Worker (in INR):</label>
+            <input type="number" id="dailyWage" min="0" placeholder="Enter daily wage per worker">
+        </div>
+        <div class="form-group">
+            <label for="expenses">Expenses Cost (in INR):</label>
+            <input type="number" id="expenses" min="0" placeholder="Enter expenses cost">
+        </div>
+        <div class="form-group">
+            <label for="extraWorkers">Number of Workers Doing Extra Work:</label>
+            <input type="number" id="extraWorkers" min="0" placeholder="Enter number of workers doing extra work" onchange="generateWorkerFields()">
+        </div>
+        <div id="extraWorkFields"></div>
+
+        <button onclick="calculate()">Calculate</button>
+        
+        <!-- Table for displaying results -->
+        <h2>Expense Summary</h2>
+        <div id="result"></div>
+        <table id="expenseTable" class="table" style="display:none;">
+            <thead>
+                <tr>
+                    <th>Worker Name</th>
+                    <th>Daily Wage (INR)</th>
+                    <th>Days Worked</th>
+                    <th>Weekly Salary (INR)</th>
+                    <th>Extra Work (KG)</th>
+                    <th>Extra Work Cost (INR)</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody id="expenseTableBody"></tbody>
+        </table>
+
+        <h3>Download Reports:</h3>
+        <button onclick="downloadPDF('daily')">Download Daily Report as PDF</button>
+        <button onclick="downloadPDF('weekly')">Download Weekly Report as PDF</button>
+        <button onclick="downloadPDF('monthly')">Download Monthly Report as PDF</button>
+        <button onclick="downloadPDF('yearly')">Download Yearly Report as PDF</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
