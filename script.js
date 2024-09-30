@@ -33,10 +33,6 @@ function generateWorkerFields() {
                 <input type="number" id="extraWork_${i}" min="0" placeholder="Enter shell cutting in KG">
             </div>
             <div class="form-group">
-                <label for="extraWorkCost_${i}">Worker ${i} Cost per KG for Shell Cutting (INR):</label>
-                <input type="number" id="extraWorkCost_${i}" min="0" placeholder="Enter cost per KG of shell cutting">
-            </div>
-            <div class="form-group">
                 <label for="daysWorked_${i}">Worker ${i} Days Worked (out of 7):</label>
                 <input type="number" id="daysWorked_${i}" min="0" max="7" placeholder="Enter days worked">
             </div>
@@ -49,26 +45,24 @@ function calculate() {
     const dailyWage = document.getElementById('dailyWage').value;
     const expenses = document.getElementById('expenses').value;
     const extraWorkers = document.getElementById('extraWorkers').value;
+    const shellCuttingCost = document.getElementById('shellCuttingCost').value;
 
     let totalSalary = 0;
     let totalExtraWorkCost = 0;
-    const extraWorkerData = [];
 
-    // Clear any existing table content before regenerating
     const tableBody = document.getElementById('expenseTableBody');
-    tableBody.innerHTML = '';
+    tableBody.innerHTML = ''; // Clear previous table data
 
     const now = new Date();
     const formattedDate = now.toLocaleDateString('en-IN');
 
-    // Calculate shell cutting cost and weekly salary for each worker
+    // Calculate total cost and salaries for each worker
     for (let i = 1; i <= extraWorkers; i++) {
         const name = document.getElementById(`workerName_${i}`).value;
         const extraWork = document.getElementById(`extraWork_${i}`).value;
-        const extraWorkCost = document.getElementById(`extraWorkCost_${i}`).value;
         const daysWorked = document.getElementById(`daysWorked_${i}`).value;
 
-        const workerExtraCost = extraWork * extraWorkCost;
+        const workerExtraCost = extraWork * shellCuttingCost;
         totalExtraWorkCost += workerExtraCost;
 
         const weeklySalary = dailyWage * daysWorked;
@@ -84,7 +78,7 @@ function calculate() {
             date: formattedDate
         };
 
-        // Store worker data by timeframe
+        // Store worker data in appropriate report category (daily, weekly, etc.)
         expenseData.daily.push(workerData);
         expenseData.weekly.push(workerData);
         expenseData.monthly.push(workerData);
@@ -107,7 +101,7 @@ function calculate() {
     const totalExpenses = parseFloat(expenses) + totalSalary + totalExtraWorkCost;
     document.getElementById('result').innerHTML = `<strong>Total Expenses: ${totalExpenses} INR</strong>`;
     
-    // Show the expense table
+    // Show the table
     document.getElementById('expenseTable').style.display = 'table';
 }
 
