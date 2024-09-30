@@ -1,57 +1,46 @@
-// Function to dynamically generate input fields for extra workers and attendance (days worked)
+// Array to store expense data categorized by timeframes
+const expenseData = {
+    daily: [],
+    weekly: [],
+    monthly: [],
+    yearly: []
+};
+
+function displayDateTime() {
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString('en-IN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    });
+    const formattedTime = now.toLocaleTimeString('en-IN');
+    document.getElementById('dateTime').innerHTML = `Date: ${formattedDate}, Time: ${formattedTime}`;
+}
+
 function generateWorkerFields() {
     const extraWorkers = document.getElementById('extraWorkers').value;
     const extraWorkFields = document.getElementById('extraWorkFields');
+    extraWorkFields.innerHTML = ''; // Clear existing fields
 
-    // Clear existing fields before generating new ones
-    extraWorkFields.innerHTML = '';
-
-    // If extra workers are entered, generate input fields for each worker
-    if (extraWorkers > 0) {
-        for (let i = 1; i <= extraWorkers; i++) {
-            const workerField = document.createElement('div');
-            workerField.classList.add('form-group');
-
-            // Label for Worker
-            const label = document.createElement('label');
-            label.textContent = `Worker ${i} - Name, Extra Work (KG), Cost per KG (INR), and Days Worked (out of 7):`;
-
-            // Input for Worker Name
-            const nameInput = document.createElement('input');
-            nameInput.type = 'text';
-            nameInput.id = `workerName_${i}`;
-            nameInput.placeholder = `Worker ${i} Name`;
-
-            // Input for Extra Work (KG)
-            const extraWorkInput = document.createElement('input');
-            extraWorkInput.type = 'number';
-            extraWorkInput.id = `extraWork_${i}`;
-            extraWorkInput.placeholder = `Extra work done by Worker ${i} (in KG)`;
-            extraWorkInput.min = 0;
-
-            // Input for Cost per KG
-            const extraWorkCostInput = document.createElement('input');
-            extraWorkCostInput.type = 'number';
-            extraWorkCostInput.id = `extraWorkCost_${i}`;
-            extraWorkCostInput.placeholder = `Cost per KG for Worker ${i} (in INR)`;
-            extraWorkCostInput.min = 0;
-
-            // Input for Days Worked
-            const daysWorkedInput = document.createElement('input');
-            daysWorkedInput.type = 'number';
-            daysWorkedInput.id = `daysWorked_${i}`;
-            daysWorkedInput.placeholder = `Days worked out of 7`;
-            daysWorkedInput.min = 0;
-            daysWorkedInput.max = 7;
-
-            workerField.appendChild(label);
-            workerField.appendChild(nameInput);
-            workerField.appendChild(extraWorkInput);
-            workerField.appendChild(extraWorkCostInput);
-            workerField.appendChild(daysWorkedInput);
-
-            extraWorkFields.appendChild(workerField);
-        }
+    for (let i = 1; i <= extraWorkers; i++) {
+        extraWorkFields.innerHTML += `
+            <div class="form-group">
+                <label for="workerName_${i}">Worker ${i} Name:</label>
+                <input type="text" id="workerName_${i}" placeholder="Enter Worker ${i}'s Name">
+            </div>
+            <div class="form-group">
+                <label for="extraWork_${i}">Worker ${i} Extra Work (KG):</label>
+                <input type="number" id="extraWork_${i}" min="0" placeholder="Enter extra work in KG">
+            </div>
+            <div class="form-group">
+                <label for="extraWorkCost_${i}">Worker ${i} Cost per KG (INR):</label>
+                <input type="number" id="extraWorkCost_${i}" min="0" placeholder="Enter cost per KG of extra work">
+            </div>
+            <div class="form-group">
+                <label for="daysWorked_${i}">Worker ${i} Days Worked (out of 7):</label>
+                <input type="number" id="daysWorked_${i}" min="0" max="7" placeholder="Enter days worked">
+            </div>
+        `;
     }
 }
 
@@ -65,6 +54,13 @@ function calculate() {
     let totalExtraWorkCost = 0;
     const extraWorkerData = [];
 
+    // Clear any existing table content before regenerating
+    const tableBody = document.getElementById('expenseTableBody');
+    tableBody.innerHTML = '';
+
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString('en-IN');
+
     // Calculate extra work cost and weekly salary for each worker
     for (let i = 1; i <= extraWorkers; i++) {
         const name = document.getElementById(`workerName_${i}`).value;
@@ -75,145 +71,64 @@ function calculate() {
         const workerExtraCost = extraWork * extraWorkCost;
         totalExtraWorkCost += workerExtraCost;
 
-        // Weekly salary calculation based on attendance
         const weeklySalary = dailyWage * daysWorked;
         totalSalary += weeklySalary;
 
-        // Store data for each worker
-        extraWorkerData.push({
-            name: name,
-            dailyWage: dailyWage,
-            extraWork: extraWork,
-            extraWorkCost: workerExtraCost,
-            daysWorked: daysWorked,
-            weeklySalary: weeklySalary
-        });
+        const workerData = {
+            name,
+            dailyWage,
+            daysWorked,
+            weeklySalary,
+            extraWork,
+            workerExtraCost,
+            date: formattedDate
+        };
+
+        // Store worker data by timeframe
+        expenseData.daily.push(workerData);
+        expenseData.weekly.push(workerData);
+        expenseData.monthly.push(workerData);
+        expenseData.yearly.push(workerData);
+
+        // Append to table
+        tableBody.innerHTML += `
+            <tr>
+                <td>${name}</td>
+                <td>${dailyWage}</td>
+                <td>${daysWorked}</td>
+                <td>${weeklySalary}</td>
+                <td>${extraWork}</td>
+                <td>${workerExtraCost}</td>
+                <td>${formattedDate}</td>
+            </tr>
+        `;
     }
 
-    const totalCost = parseFloat(totalSalary) + parseFloat(expenses) + parseFloat(totalExtraWorkCost);
-
-    const dateTime = new Date();
-    const formattedDate = dateTime.toLocaleDateString('en-IN', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-    });
-    const formattedTime = dateTime.toLocaleTimeString('en-IN');
-
-    document.getElementById('result').innerHTML = `
-        <p>Date: ${formattedDate}</p>
-        <p>Time: ${formattedTime}</p>
-        <p>Total Salary for Workers: INR ${totalSalary}</p>
-        <p>Total Expenses: INR ${expenses}</p>
-        <p>Total Extra Work Cost: INR ${totalExtraWorkCost}</p>
-        <p><strong>Total Today’s Expense: INR ${totalCost}</strong></p>
-    `;
-
-    // Store the data locally with the date as a key
-    const storedData = JSON.parse(localStorage.getItem('businessData')) || [];
-    storedData.push({
-        date: formattedDate,
-        time: formattedTime,
-        totalSalary,
-        totalExpenses: expenses,
-        totalExtraWorkCost,
-        totalCost,
-        extraWorkerData
-    });
-    localStorage.setItem('businessData', JSON.stringify(storedData));
-
-    // Download data as Excel file
-    downloadExcel({
-        date: formattedDate,
-        time: formattedTime,
-        totalSalary,
-        totalExpenses: expenses,
-        totalExtraWorkCost,
-        totalCost,
-        extraWorkerData
-    });
+    const totalExpenses = parseFloat(expenses) + totalSalary + totalExtraWorkCost;
+    document.getElementById('result').innerHTML = `<strong>Total Expenses: ${totalExpenses} INR</strong>`;
+    
+    // Show the expense table
+    document.getElementById('expenseTable').style.display = 'table';
 }
 
-function downloadExcel(data) {
-    const worksheetData = [
-        ['Date', 'Time', 'Total Salary', 'Total Expenses', 'Total Extra Work Cost', 'Total Cost'],
-        [data.date, data.time, data.totalSalary, data.totalExpenses, data.totalExtraWorkCost, data.totalCost],
-        ['Worker Name', 'Daily Wage', 'Days Worked (out of 7)', 'Weekly Salary', 'Extra Work (KG)', 'Extra Work Cost'],
-    ];
+function downloadPDF(reportType) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
 
-    data.extraWorkerData.forEach(worker => {
-        worksheetData.push([worker.name, worker.dailyWage, worker.daysWorked, worker.weeklySalary, worker.extraWork, worker.extraWorkCost]);
+    doc.text(`Business Expenses Report - ${reportType}`, 14, 10);
+    doc.autoTable({
+        head: [['Worker Name', 'Daily Wage (INR)', 'Days Worked', 'Weekly Salary (INR)', 'Extra Work (KG)', 'Extra Work Cost (INR)', 'Date']],
+        body: expenseData[reportType].map(worker => [
+            worker.name,
+            worker.dailyWage,
+            worker.daysWorked,
+            worker.weeklySalary,
+            worker.extraWork,
+            worker.workerExtraCost,
+            worker.date
+        ]),
+        startY: 30
     });
 
-    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Expenses');
-    XLSX.writeFile(workbook, `Business_Expenses_${data.date}_${data.time}.xlsx`);
-}
-
-// Function to display stored data based on date range (daily, weekly, monthly, yearly)
-function displayStoredData(range) {
-    const storedData = JSON.parse(localStorage.getItem('businessData')) || [];
-    let filteredData = [];
-
-    // Filter data based on the range (daily, weekly, monthly, yearly)
-    const today = new Date();
-
-    storedData.forEach((entry) => {
-        const entryDate = new Date(entry.date);
-        if (range === 'daily' && entryDate.toDateString() === today.toDateString()) {
-            filteredData.push(entry);
-        } else if (range === 'weekly' && (today - entryDate) / (1000 * 60 * 60 * 24) <= 7) {
-            filteredData.push(entry);
-        } else if (range === 'monthly' && today.getMonth() === entryDate.getMonth() && today.getFullYear() === entryDate.getFullYear()) {
-            filteredData.push(entry);
-        } else if (range === 'yearly' && today.getFullYear() === entryDate.getFullYear()) {
-            filteredData.push(entry);
-        }
-    });
-
-    let resultHtml = '<ul>';
-    filteredData.forEach((entry) => {
-        resultHtml += `
-            <li>Date: ${entry.date}, Time: ${entry.time}, Total Expense: INR ${entry.totalCost}</li>
-        `;
-    });
-    resultHtml += '</ul>';
-    document.getElementById('storedDataDisplay').innerHTML = resultHtml;
-}
-
-function displayWorkerPayments(range) {
-    const workerName = document.getElementById('workerName').value;
-    const storedData = JSON.parse(localStorage.getItem('businessData')) || [];
-
-    let filteredData = [];
-    const today = new Date();
-
-    storedData.forEach((entry) => {
-        const entryDate = new Date(entry.date);
-        if (entry.extraWorkerData) {
-            entry.extraWorkerData.forEach((worker) => {
-                if (worker.name.toLowerCase() === workerName.toLowerCase()) {
-                    if (range === 'weekly' && (today - entryDate) / (1000 * 60 * 60 * 24) <= 7) {
-                        filteredData.push(worker);
-                    } else if (range === 'monthly' && today.getMonth() === entryDate.getMonth() && today.getFullYear() === entryDate.getFullYear()) {
-                        filteredData.push(worker);
-                    }
-                }
-            });
-        }
-    });
-
-    let resultHtml = `<h4>${workerName}'s ${range.charAt(0).toUpperCase() + range.slice(1)} Payments</h4><ul>`;
-    let totalPayment = 0;
-
-    filteredData.forEach((worker) => {
-        resultHtml += `
-            <li>Extra Work: ${worker.extraWork} KG, Extra Work Cost: INR ${worker.extraWorkCost}, Daily Wage: INR ${worker.dailyWage}, Weekly Salary: INR ${worker.weeklySalary}</li>
-        `;
-        totalPayment += parseFloat(worker.extraWorkCost) + parseFloat(worker.weeklySalary);
-    });
-
-    resultHtml += `</ul><strong>Total ${range.charAt(0).toUpperCase() + range.slice(1)} Payment: INR ${totalPayment}</strong>`;
-    document.getElementById('workerPaymentDisplay').innerHTML = resultHtml;
+    doc.save(`${reportType}-business-expenses.pdf`);
 }
